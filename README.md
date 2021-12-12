@@ -1,2 +1,2 @@
-# docker-bind-alpine
-BIND 9 running on Alpine linux
+# docker-bind
+BIND 9 running in a container

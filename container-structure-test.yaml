@@ -1,0 +1,21 @@
+---
+schemaVersion: '2.0.0'
+
+metadataTest:
+  exposedPorts:
+    - "53"
+  user: "100"
+
+fileExistenceTests:
+  - name: named
+    path: "/usr/sbin/named"
+    shouldExist: true
+    isExecutableBy: "any"
+
+commandTests:
+  - name: "named"
+    command: "named"
+    args:
+      - "-v"
+    expectedOutput:
+      - 'BIND 9'

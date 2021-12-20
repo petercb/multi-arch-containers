@@ -1,0 +1,14 @@
+---
+schemaVersion: '2.0.0'
+
+metadataTest:
+  user: "65534"
+
+fileExistenceTests:
+  - name: external-dns
+    path: "/bin/external-dns"
+    shouldExist: true
+    isExecutableBy: "any"
+  - name: ca-certs
+    path: "/etc/ssl/certs/ca-certificates.crt"
+    shouldExist: true

@@ -1,88 +1,13 @@
----
 version: 2.1
-
+setup: true
 orbs:
-  docker: circleci/docker@2.0.1
-
-jobs:
-  build:
-    machine:
-      image: ubuntu-2004:202111-01
-    parameters:
-      extra-args:
-        type: string
-        default: ""
-      platforms:
-        type: string
-        default: linux/arm/v7,linux/arm64/v8,linux/amd64
-      push:
-        type: boolean
-        default: false
-      repo-name:
-        type: string
-      version:
-        type: string
-    steps:
-      - checkout
-      - docker/check
-      - run:
-          name: Configure Buildx builder
-          command: docker buildx create --driver docker-container --name container --node container0 --use
-      - run:
-          name: << parameters.repo-name >> - build
-          command: >-
-            docker buildx build
-            --builder container
-            --progress plain
-            <<# parameters.push >>
-            --push
-            <</ parameters.push >>
-            --platform << parameters.platforms >>
-            --build-arg VERSION=<< parameters.version >>
-            <<# parameters.extra-args >>
-            << parameters.extra-args >>
-            <</ parameters.extra-args >>
-            --cache-from ${DOCKER_LOGIN}/<< parameters.repo-name >>:cache
-            <<# parameters.push >>
-            --cache-to ${DOCKER_LOGIN}/<< parameters.repo-name >>:cache
-            <</ parameters.push >>
-            --tag ${DOCKER_LOGIN}/<< parameters.repo-name >>:<< parameters.version >>-<< pipeline.number >>
-            --tag ${DOCKER_LOGIN}/<< parameters.repo-name >>:<< parameters.version >>
-            --tag ${DOCKER_LOGIN}/<< parameters.repo-name >>:latest
-            .
-      - run:
-          name: Install container-structure-test
-          command: |
-            destFile="${HOME}/bin/container-structure-test"
-            mkdir -p "${HOME}/bin"
-            curl -L -o "${destFile}" \
-              https://storage.googleapis.com/container-structure-test/latest/container-structure-test-linux-amd64
-            chmod +x "${destFile}"
-      - run:
-          name: << parameters.repo-name >> - container-structure-test
-          command: >-
-            container-structure-test test
-            --image ${DOCKER_LOGIN}/<< parameters.repo-name >>:<< parameters.version >>-<< pipeline.number >>
-            --config container-structure-test.yaml
-            --output junit
-            --test-report test-report.xml
-            --pull
-      - store_test_results:
-          path: test-report.xml
-
+  path-filtering: circleci/path-filtering@0.0.2
 workflows:
-  version: 2
-  container-build:
+  generate-config:
     jobs:
-      - build: &build
-          context: DockerHub
-          repo-name: bind9
-          version: 9.16.22-r4
-  container-build-and-push:
-    jobs:
-      - build:
-          <<: *build
-          push: true
-          filters:
-            branches:
-              only: main
+      - path-filtering/filter:
+          base-revision: master
+          config-path: .circleci/continue_config.yml
+          mapping: |
+            bind/.* build-bind true
+            external-dns/.* build-ed true

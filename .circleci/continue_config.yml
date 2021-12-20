@@ -1,0 +1,126 @@
+version: 2.1
+
+orbs:
+  docker: circleci/docker@2.0.1
+
+parameters:
+  build-bind:
+    type: boolean
+    default: false
+  build-ed:
+    type: boolean
+    default: false
+
+commands:
+  configure-buildx:
+    steps:
+      - run: docker buildx create --driver docker-container --name container --node container0 --use
+  buildx:
+    parameters:
+      extra-args:
+        type: string
+        default: ""
+      platforms:
+        type: string
+        default: linux/arm64/v8,linux/amd64
+      repo-name:
+        type: string
+      repository:
+        type: string
+        default: ghcr.io
+      work-dir:
+        type: string
+    steps:
+      - run:
+          name: Retrieve version
+          working_directory: << parameters.work-dir >>
+          command: |
+            VERSION="$(grep 'ARG VERSION=' Dockerfile | cut -d= -f2)"
+            echo "${VERSION}"
+            echo "export VERSION=${VERSION}" >> "${BASH_ENV}"
+      - run:
+          name: << parameters.repo-name >> - build
+          working_directory: << parameters.work-dir >>
+          command: >-
+            docker buildx build
+            --builder container
+            --progress plain
+            --push
+            --platform << parameters.platforms >>
+            <<# parameters.extra-args >>
+            << parameters.extra-args >>
+            <</ parameters.extra-args >>
+            --cache-from << parameters.repository >>/${DOCKER_LOGIN}/<< parameters.repo-name >>:cache
+            --cache-to << parameters.repository >>/${DOCKER_LOGIN}/<< parameters.repo-name >>:cache
+            --tag << parameters.repository >>/${DOCKER_LOGIN}/<< parameters.repo-name >>:$VERSION-<< pipeline.number >>
+            .
+      - run:
+          name: << parameters.repo-name >> - container-structure-test
+          working_directory: << parameters.work-dir >>
+          command: >-
+            container-structure-test test
+            --image << parameters.repository >>/${DOCKER_LOGIN}/<< parameters.repo-name >>:$VERSION-<< pipeline.number >>
+            --config container-structure-test.yaml
+            --pull
+            --output junit
+            --test-report << parameters.repo-name >>-cst-results.xml
+      - store_test_results:
+          path: << parameters.repo-name >>-cst-results.xml
+      - run:
+          name: << parameters.repo-name >> - build latest and version tags
+          working_directory: << parameters.work-dir >>
+          command: >-
+            docker buildx build
+            --builder container
+            --progress plain
+            --push
+            --platform << parameters.platforms >>
+            <<# parameters.extra-args >>
+            << parameters.extra-args >>
+            <</ parameters.extra-args >>
+            --cache-from << parameters.repository >>/${DOCKER_LOGIN}/<< parameters.repo-name >>:cache
+            --cache-to << parameters.repository >>/${DOCKER_LOGIN}/<< parameters.repo-name >>:cache
+            --tag << parameters.repository >>/${DOCKER_LOGIN}/<< parameters.repo-name >>:$VERSION
+            --tag << parameters.repository >>/${DOCKER_LOGIN}/<< parameters.repo-name >>:latest
+            .
+  install-cst:
+    steps:
+      - run:
+          name: Install container-structure-test
+          command: |
+            destFile="${HOME}/bin/container-structure-test"
+            mkdir -p "${HOME}/bin"
+            curl -L -o "${destFile}" \
+              https://storage.googleapis.com/container-structure-test/latest/container-structure-test-linux-amd64
+            chmod +x "${destFile}"
+
+jobs:
+  build:
+    machine:
+      image: ubuntu-2004:202111-01
+    steps:
+      - checkout
+      - docker/check:
+          registry: ghcr.io
+      - install-cst
+      - configure-buildx
+      - when:
+          condition: << pipeline.parameters.build-bind >>
+          steps:
+            - buildx:
+                repo-name: bind
+                work-dir: bind
+      - when:
+          condition: << pipeline.parameters.build-ed >>
+          steps:
+            - buildx:
+                repo-name: external-dns
+                work-dir: external-dns
+                extra-args: --target runtime
+
+workflows:
+  version: 2
+  container-build:
+    jobs:
+      - build:
+          context: ghcr

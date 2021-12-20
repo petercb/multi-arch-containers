@@ -6,7 +6,7 @@ RUN apk add --no-cache bind=${VERSION}
 
 EXPOSE 53
 
-USER 100
+USER 100:101
 
 ENTRYPOINT ["/usr/sbin/named"]
 

@@ -4,7 +4,7 @@ schemaVersion: '2.0.0'
 metadataTest:
   exposedPorts:
     - "53"
-  user: "100"
+  user: "100:101"
 
 fileExistenceTests:
   - name: named

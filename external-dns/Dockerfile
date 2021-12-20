@@ -1,12 +1,14 @@
 FROM golang:1.16 AS builder
 
+ARG TARGETARCH
+ARG TARGETVARIANT
 ARG VERSION=0.10.2
 
 ADD https://github.com/kubernetes-sigs/external-dns/archive/refs/tags/v${VERSION}.tar.gz /tmp/external-dns.tar.gz
 
 RUN \
     tar xf /tmp/external-dns.tar.gz && \
-    make -C external-dns-${VERSION} test build && \
+    make -C external-dns-${VERSION} test build.${TARGETARCH}${TARGETVARIANT} && \
     mv external-dns-${VERSION}/build/external-dns /tmp/external-dns
 
 FROM alpine:3.15.0 AS runtime

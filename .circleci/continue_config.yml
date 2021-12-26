@@ -27,7 +27,7 @@ commands:
         type: string
       repository:
         type: string
-        default: ghcr.io
+        default: docker.io
       work-dir:
         type: string
     steps:
@@ -100,8 +100,7 @@ jobs:
       image: ubuntu-2004:202111-01
     steps:
       - checkout
-      - docker/check:
-          registry: ghcr.io
+      - docker/check
       - install-cst
       - configure-buildx
       - when:
@@ -123,4 +122,4 @@ workflows:
   container-build:
     jobs:
       - build:
-          context: ghcr
+          context: DockerHub

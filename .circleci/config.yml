@@ -11,3 +11,5 @@ workflows:
           mapping: |
             bind/.* build-bind true
             ubooquity/.* build-ubooquity true
+            \.circleci/.* build-ubooquity true
+            \.circleci/.* build-bind true

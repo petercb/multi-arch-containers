@@ -14,7 +14,12 @@ parameters:
 commands:
   configure-buildx:
     steps:
-      - run: docker buildx create --driver docker-container --name container --node container0 --use
+      - run:
+          name: Create builder
+          command: docker buildx create --driver docker-container --name container --node container0 --use
+      - run:
+          name: Installing emulators
+          command: docker run --privileged --rm tonistiigi/binfmt --install all
   buildx:
     parameters:
       extra-args:

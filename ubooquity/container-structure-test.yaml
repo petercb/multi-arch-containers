@@ -1,0 +1,22 @@
+---
+schemaVersion: '2.0.0'
+
+metadataTest:
+  exposedPorts:
+    - "2202"
+    - "2203"
+  user: "1000"
+
+fileExistenceTests:
+  - name: ubooquity
+    path: "/app/ubooquity/Ubooquity.jar"
+    shouldExist: true
+
+commandTests:
+  - name: java
+    command: java
+    args:
+      - "-version"
+    expectedError:
+      - "openjdk"
+      - "10.0."

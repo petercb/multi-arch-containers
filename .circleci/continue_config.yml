@@ -7,7 +7,7 @@ parameters:
   build-bind:
     type: boolean
     default: false
-  build-ed:
+  build-ubooquity:
     type: boolean
     default: false
 
@@ -111,11 +111,11 @@ jobs:
                 repo-name: bind
                 work-dir: bind
       - when:
-          condition: << pipeline.parameters.build-ed >>
+          condition: << pipeline.parameters.build-ubooquity >>
           steps:
             - buildx:
-                repo-name: external-dns
-                work-dir: external-dns
+                repo-name: ubooquity
+                work-dir: ubooquity
                 extra-args: --target runtime
 
 workflows:

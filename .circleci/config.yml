@@ -10,4 +10,4 @@ workflows:
           config-path: .circleci/continue_config.yml
           mapping: |
             bind/.* build-bind true
-            external-dns/.* build-ed true
+            ubooquity/.* build-ubooquity true

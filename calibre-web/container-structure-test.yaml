@@ -1,0 +1,21 @@
+---
+schemaVersion: '2.0.0'
+
+metadataTest:
+  exposedPorts:
+    - "8083"
+  user: "1000"
+
+fileExistenceTests:
+  - name: cps
+    path: "/app/bin/cps"
+    shouldExist: true
+    isExecutableBy: "any"
+
+commandTests:
+  - name: python
+    command: python
+    args:
+      - "-V"
+    expectedOutput:
+      - "Python 3.8."

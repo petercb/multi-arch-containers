@@ -1,0 +1,20 @@
+---
+schemaVersion: '2.0.0'
+
+metadataTest:
+  exposedPorts:
+    - "8888"
+  user: "1000"
+
+fileExistenceTests:
+  - name: webdav
+    path: "/webdav"
+    shouldExist: true
+
+commandTests:
+  - name: webdav
+    command: /webdav
+    args:
+      - "version"
+    expectedOutput:
+      - "WebDAV"

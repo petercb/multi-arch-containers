@@ -11,6 +11,7 @@ function cleanup {
 trap cleanup EXIT
 
 docker buildx create --driver docker-container --name container --node container0 --use
+docker run --privileged --rm tonistiigi/binfmt --install all
 
 for dockerfile in ${1:-*}/Dockerfile
 do

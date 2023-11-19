@@ -1,6 +1,6 @@
-FROM alpine:3.15.0 AS build
+FROM alpine:3.18.4 AS build
 
-ARG VERSION=4.1.1
+ARG VERSION=4.2.0
 ARG TARGETOS
 ARG TARGETARCH
 ARG TARGETVARIANT
@@ -11,7 +11,7 @@ WORKDIR /app
 
 RUN tar -xf /tmp/webdav.tar.gz
 
-FROM alpine:3.15.0 AS runtime
+FROM alpine:3.18.4 AS runtime
 
 COPY --from=build /app/webdav /webdav
 

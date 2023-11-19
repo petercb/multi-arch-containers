@@ -7,9 +7,6 @@ parameters:
   build-bind:
     type: boolean
     default: false
-  build-ubooquity:
-    type: boolean
-    default: false
   build-calibre-web:
     type: boolean
     default: false
@@ -120,13 +117,6 @@ jobs:
             - buildx:
                 repo-name: bind
                 work-dir: bind
-      - when:
-          condition: << pipeline.parameters.build-ubooquity >>
-          steps:
-            - buildx:
-                repo-name: ubooquity
-                work-dir: ubooquity
-                extra-args: --target runtime
       - when:
           condition: << pipeline.parameters.build-calibre-web >>
           steps:

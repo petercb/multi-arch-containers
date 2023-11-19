@@ -1,10 +1,12 @@
-FROM alpine:3.15.0
+FROM alpine:3.18.4
 
-ARG VERSION=9.16.22-r4
+ARG VERSION=9.18.19-r0
 
 RUN \
-  apk add --no-cache bind=${VERSION} && \
-  setcap CAP_NET_BIND_SERVICE=+eip /usr/sbin/named
+  apk add --no-cache \
+    bind=${VERSION} \
+    libcap-utils=2.69-r0 \
+  && setcap CAP_NET_BIND_SERVICE=+eip /usr/sbin/named
 
 EXPOSE 53
 

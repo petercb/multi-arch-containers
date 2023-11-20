@@ -7,9 +7,6 @@ parameters:
   build-bind:
     type: boolean
     default: false
-  build-calibre-web:
-    type: boolean
-    default: false
   build-webdav:
     type: boolean
     default: false
@@ -117,13 +114,6 @@ jobs:
             - buildx:
                 repo-name: bind
                 work-dir: bind
-      - when:
-          condition: << pipeline.parameters.build-calibre-web >>
-          steps:
-            - buildx:
-                repo-name: calibre-web
-                work-dir: calibre-web
-                extra-args: --target runtime
       - when:
           condition: << pipeline.parameters.build-webdav >>
           steps:

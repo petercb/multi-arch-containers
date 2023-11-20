@@ -10,6 +10,4 @@ workflows:
           config-path: .circleci/continue_config.yml
           mapping: |
             bind/.* build-bind true
-            ubooquity/.* build-ubooquity true
-            calibre-web/.* build-calibre-web true
             webdav/.* build-webdav true

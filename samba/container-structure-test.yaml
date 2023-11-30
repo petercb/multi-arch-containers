@@ -1,0 +1,28 @@
+---
+schemaVersion: '2.0.0'
+
+metadataTest:
+  exposedPorts:
+    - "137"
+    - "138"
+    - "139"
+    - "445"
+
+fileExistenceTests:
+  - name: smb.conf
+    path: "/etc/samba/smb.conf"
+    shouldExist: true
+  - name: smbd
+    path: "/usr/sbin/smbd"
+    shouldExist: true
+  - name: bash
+    path: "/bin/bash"
+    shouldExist: true
+
+commandTests:
+  - name: smbd
+    command: /usr/sbin/smbd
+    args:
+      - "--usage"
+    expectedOutput:
+      - "Usage: smbd "

@@ -10,4 +10,5 @@ workflows:
           config-path: .circleci/continue_config.yml
           mapping: |
             bind/.* build-bind true
+            samba/.* build-samba true
             webdav/.* build-webdav true

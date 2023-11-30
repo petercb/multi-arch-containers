@@ -7,6 +7,9 @@ parameters:
   build-bind:
     type: boolean
     default: false
+  build-samba:
+    type: boolean
+    default: false
   build-webdav:
     type: boolean
     default: false
@@ -114,6 +117,12 @@ jobs:
             - buildx:
                 repo-name: bind
                 work-dir: bind
+      - when:
+          condition: << pipeline.parameters.build-samba >>
+          steps:
+            - buildx:
+                repo-name: samba
+                work-dir: samba
       - when:
           condition: << pipeline.parameters.build-webdav >>
           steps:

@@ -1,6 +1,6 @@
-FROM alpine:3.18.4
+FROM alpine:3.19.1
 
-ARG VERSION=4.18.8-r0
+ARG VERSION=4.18.9-r0
 
 # hadolint ignore=DL3018
 RUN apk --no-cache --no-progress add \

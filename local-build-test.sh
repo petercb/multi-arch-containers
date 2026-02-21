@@ -1,24 +1,31 @@
 #!/bin/bash
 
-set -e
-set -u
+set -eu
 
-function cleanup {
-    echo "Stopping builder"
-    docker buildx stop container
-}
+export DOCKER_BUILDKIT=1
+export BUILDKIT_PROGRESS=plain
 
-trap cleanup EXIT
-
-docker buildx create --driver docker-container --name container --node container0 --use
-docker run --privileged --rm tonistiigi/binfmt --install all
+PLATFORMS=("linux/aarch64" "linux/amd64")
 
 for dockerfile in ${1:-*}/Dockerfile
 do
     image="$(dirname ${dockerfile})"
     pushd "${image}"
-    docker buildx build --builder container --load --platform linux/amd64 -t petercb/${image}:latest .
-    container-structure-test test --config container-structure-test.yaml --image petercb/${image}:latest
-    docker buildx build --builder container --platform linux/arm64/v8 -t petercb/${image}:latest .
+    if [ -f build-env.sh ]; then
+        source build-env.sh
+    fi
+
+    for platform in "${PLATFORMS[@]}"; do
+        echo "Building ${image} for ${platform}"
+        docker build \
+            --tag "petercb/${image}:latest" \
+            --platform "${platform}" \
+            --file Dockerfile \
+            .
+        container-structure-test test \
+            --platform "${platform}" \
+            --config container-structure-test.yaml \
+            --image "petercb/${image}:latest"
+    done
     popd
 done

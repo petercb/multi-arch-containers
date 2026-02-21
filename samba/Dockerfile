@@ -1,14 +1,14 @@
-FROM alpine:3.21.3
+FROM alpine:3.23.3
 
-ARG VERSION=4.20.6-r1
+ARG VERSION=4.22.6-r0
 
 # hadolint ignore=DL3018
 RUN apk --no-cache --no-progress add \
-        bash \
-        samba=${VERSION} \
-        shadow \
-        tini \
-        tzdata && \
+    bash \
+    samba=${VERSION} \
+    shadow \
+    tini \
+    tzdata && \
     addgroup -S smb && \
     adduser -S -D -H -h /tmp -s /sbin/nologin -G smb -g 'Samba User' smbuser
 
